@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>[TrustedInstaller/v1] bootstrap.js</title>
+        <style>
+            body {
+                font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+                background-color:#333333; border: 1px solid #444444; 
+                border-radius: 0.333em;
+                color: cornflowerblue;
+            }
+            body > * { 
+                margin: 0.5rem calc((1.333rem - 0.333em) / 2);
+                padding: calc(0.111em + 0.222rem) 0.667rem;
+                background-color: #222222;
+                border: 1px solid #555555;
+                border-radius: 0.333rem;
+                box-shadow: 4px -4px 24px 8px rgba(0,0,0,0.333);
+            }
+            body * { color: unset!important; transition: all 666ms ease-out;  }
+            a:hover { color: #AAAAAA!important; }
+            h1 { color: #EEEEEE!important; }
+            h3 { color: cornflowerblue!important; font-family: Arial, Helvetica, sans-serif; font-weight: 500;  }
+            div {
+                display: flexbox;
+                padding: none;
+                margin: 0.25rem;
+            }
+            h5 { color: #444444!important;
+                font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif; 
+                font-size: 1.11rem;
+                text-rendering: geometricPrecision;
+                text-align: right;
+                user-select: none;
+                cursor: alias;
+                position: relative;
+                margin: 0;
+                padding: 0.25rem!important;
+            }
+            h5:hover { color: crimson!important; }
+            iframe { cursor: progress!important; }
+        </style>
+        <script src="./bootstrap.js"></script>
+        <script>
+            function hook(x) { return function _x(ev) { console.debug("core-eventsd", ev); return x(ev); }};
+            window.hook = Object.seal(hook);
+        </script>
+    </head>
+    <body>
+        <h1><a href="http://localhost/haptloader/v1.js">bootstrap.js</a></h1>
+        <h3><a href="http://localhost/haptloader/TrustedInstaller/README.htm">[TrustedInstaller/v1]</a></h3>
+        <iframe src="http://localhost/haptloader/TrustedInstaller/README.htm" width="280" height="96"></iframe>
+        <div id="float"><h5 id="logo">created by djmill0326</h5></div>
+        <script>
+            function global_this() {
+                return kiss(this, "this")[0];
+            }
+            function str(sealed_object) {
+                return "ehpt-generic/v1<" + sealed_object[1][1] + "> [" + sealed_object[0] + "]";
+            }
+            function object(name) {
+                return kiss([Uint8Array.bind(global_this[0]), name], "hapt-object");
+            }
+            function kiss(x, name) {
+                return Object.seal([x, object(x, name)]);
+            }
+            function hapt_abi(spec) {
+                return kiss("haptloader/" + spec, "abi-v" + spec);
+            }
+            function type_pool(extend=[]) {
+                return kiss({
+                    abi: hapt_abi("v1"),
+                    types: Object.create([global_this(), ...extend,
+                        kiss(Function, "js-fn"),
+                        kiss(Object, "js-object"),
+                        kiss(Array, "js-array"),
+                        kiss(Uint8ClampedArray, "utf8"),
+                        kiss(Uint8Array, "native"),
+                        kiss(Uint16Array, "native-w"),
+                        kiss(Uint32Array, "native-word"),
+                        kiss(String, "str"),
+                        kiss(Number, "int"),
+                        kiss(Number, "float"),
+                    ]),
+                }, "type-pool")
+            }
+            function event_pool() {
+                function event(name) {
+                    return kiss(name, "event:" + name)
+                }
+                function get_store() {
+                    if(!global_this().store) {
+                        global_this().store = kiss({
+                            ref: global_this().store,
+                            storage: Object.create({}),
+                            create:     function(id) { 
+                                get_store().storage[id] = kiss(id, "hapt-object");
+                            }, read:    function(id) {
+                                return get_store().storage[id][0][0];
+                            }, update:  function(id, x) {
+                                return get_store().storage[id][0][0] = Uint8Array.from(x);
+                            }, rename:  function(id, x) {
+                                return get_store().storage[id][0][1] = x;
+                            }, destroy: function(id) {
+                                delete get_store().storage[id];
+                            },
+                        }, "ehpt-store");
+                    }
+                    return global_this().store;
+                }
+                return {
+                    abi: hapt_abi("v1"),
+                    types: type_pool([event("create"), event("read"), event("update"), event("destroy")]),
+                    pool: kiss({
+                        store: get_store(),
+                        add: function(type, element, handler) {
+                            const id = "ehpt:" + Performance.now();
+                            store.create(type, id);
+                            store.update(id, [element, handler])
+                            console.log("[ehptloader] registered event handler");
+                            return id;
+                        },
+                        rem: function(id) {
+                            store.destroy(id);
+                            console.log("[ehptloader] destroyed event handler");
+                        }
+                    }, "ehpt-pool")
+                }
+            }
+            function outerp(x, y) {
+                return Math.pow(x, 2) + Math.pow(y, 2);
+            }
+            function interp(x, y) {
+                return Math.sqrt(outerp(x, y));
+            }
+            function linterp(x1, x2) {
+                return (x1 + x2) / 2;
+            }
+            function llinterp(x1, x2) {
+                return (x1 - x2) * 2;
+            }
+            function distance(x1, x2) {
+                return llinterp(x1, x2);
+            }
+            function center(x1, x2) {
+                return Math.sqrt(x1 + 0.5 * x2) * 2;
+            }
+            const console = {
+                log: function(x) { alert("[sorry] " + x); },
+                debug: window.console.log,
+                warn: window.console.warn
+            };
+            function listen(element, event_name, hook) {
+                var hook = window.hook(hook);
+                function x(ev) { return hook(ev); }
+                element.addEventListener(event_name, x);
+            }
+            function listen_silent(element, event_name, hook) {
+                function x(ev) { ev.preventDefault(); return window.hook(ev); }
+                listen(element, event_name, x);
+            }
+            function listen_all(event_name, elements, hook, silent=false) {
+                function log(ev) { console.log("[hook-listener]", ev); }
+                function x(ev) { logger(ev); return window.hook(ev); }
+                elements.forEach(element => listeners.push(listen_debounced(element, event_name, hook, silent)));
+            }
+            window.rpc = { listen, listen_silent, listen_all };
+            function animate(element, event, timing, fn) {
+                var prior_x = logo.offsetY;
+                var travelled = 0;
+                listen(element, event, function on_event(ev) {
+                function cb(delta_t) {
+                    const ev = get_event();
+                    return fn(delta_t, ev.offsetX, element.offsetY, element.clientWidth, element.clientHeight);
+                }
+                requestAnimationFrame(cb);
+            })}
+            function overcomplexifi(element) {
+                listen(element, "mousemove", function mousemove(ev) {
+                function cb(delta_t) {
+                    var excess = 10 - travelled;
+                    travelled = 0;
+                    var dist_x = distance(ev.offsetX, prior_x);
+                    prior_x = ev.offsetX;
+                    var fancy = Math.sin(ev.offsetY) * 3;
+                    var fancy_t = Math.cos(delta_t) * 5;
+                    var mixed_fancy = Math.log(fancy + fancy_t);
+                    function make_neat(prior, pos, offset, dist) {
+                        return dist + mixed_fancy - offset / 2;
+                    }
+                    travelled = Math.min(make_neat(prior_x, ev.offsetX, logo.clientWidth, dist_x), 0);
+                    travelled = Math.max(travelled, 360); 
+                    logo.style.left = ev.offsetX + Math.min(ev.offsetX + travelled, excess) + "px";
+                }
+                requestAnimationFrame(cb);
+            });
+            }
+        </script>
+    </body>
+</html>

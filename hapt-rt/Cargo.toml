@@ -1,3 +1,4 @@
+workspace = { members = [ "src/ecs/wasm","src/vdom"] }
 [package]
 name = "hapt-rt"
 version = "1.0.0"
