@@ -1,100 +1,102 @@
 enum Short {
-    UPPER=0xFF
+    UPPER=0xFF,
     LOWER=0x00,
     RESET=UPPER,
     STRAP=LOWER
-}
+};
 
 union Ptr {
     union UTF8 {
-        unsigned char,
-        char,
-        Short
+        unsigned char UChar;
+        char Char;
+        Short Unicode;
     };
 
     union UTF16 {
-        unsigned short,
-        short,
-        UTF8
+        unsigned short UShort;
+        short Short;
+        UTF8 Unicode;
     };
 
     union Full {
-        unsigned long,
-        long,
-        Half
+        unsigned long ULong;
+        long Long;
+        UTF16 Unicode;
     };
 
     union Long {
-        void*,
-        Long, 
-        Data::Full
+        void* c_void;
+        Long* ptr;
+        Data::Full Long;
     };
+
+    NamedKV kv;
 };
 
 union Data {
     union Str {
-        const char*
+        const char* String;
     };
 
     union Unicode {
-        Ptr::Unicode
+        Ptr::UTF8 UTF8;
+        Ptr::UTF16 UTF16;
+        Ptr::Full Unicode;
     };
 
     union Half {
-        Ptr::Half
+        Ptr::Full Full;
     };
 
     union Full {
-        Ptr::Full
+        Ptr::Long Long;
     };
 
     union Long {
-        unsigned long long,
-        long long,
-        unsigned long int,
-        long int,
-        int,
-        Ptr::Long
+        unsigned long long ULL;
+        long long LL;
+        unsigned long int UInt;
+        long int Int;
+        int IInt;
+        Ptr::Long Full;
     };
 };
 
 struct NamedKV {
-    static char* name;
-    unsigned long id;
+    Data::Str name;
+    Data::Half id;
 };
 
 union KVPair {
     union key {
-        Data::Half,
-        NamedKV
+        Data::Half data;
+        NamedKV named_kv;
     };
 
     union value {
-        Data::Half
+        Data::Half data;
     };
 
     struct kv_store {
-        KVPair::key,
-        KVPair::value
+        KVPair::key k;
+        KVPair::value v;
     };
 };
 
 static unsigned long TICKER = 0;
 
-Ptr make_kv_pair_key(name: Data::Str) {
-    NamedKV key;
-    key.name = key;
-    Ptr::Full full;
-    full.
-    key.id = ++TICKER;
-    return key;
+Ptr make_kv_pair_key(Data::Str name) {
+    NamedKV kv;
+    kv.name = name;
+    kv.id = ++TICKER;
+    Ptr ptr;
+    ptr.kv = kv;
 }
 
-Data make_kv_pair_value(value: Ptr::Long) {
-    static const Data::Str NAME = "ehptloader";
-    NamedKV value;
-    value.name = NAME;
-    value.id = (unsigned long) value;
+Data make_kv_pair_value(Data value) {
+    NamedKV kv;
+    kv.name = *&"hapt-store";
+    kv.id = value;
     return value;
 }
 
