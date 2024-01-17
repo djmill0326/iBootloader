@@ -1,46 +1,46 @@
 use std::{sync::Arc, borrow::Cow};
 
-struct File();
+pub struct File(usize);
 
-fn file_io() -> File {
-    File()
+pub fn file_io() -> File {
+    File(0)
 }
 
-type Semver = Cow<'static, u16>;
+pub type Semver = Cow<'static, u16>;
 
 static mut SEMVER: Semver = Cow::Owned(0);
 
-fn semver() -> Semver {
+pub fn semver() -> Semver {
     Cow::Owned(unsafe { SEMVER.wrapping_add(1) })
 }
 
-struct Version(u8, u8, Semver);
+pub struct Version(u8, u8, Semver);
 
 impl Version {
-    fn x(i: u8) -> Self {
+    pub fn x(i: u8) -> Self {
         Self(i, 0, semver())
     }
 
-    fn xx(i: u8, j: u16) -> Self {
+    pub fn xx(i: u8, j: u16) -> Self {
         Self(i, (j % 0xFF).try_into().expect("u8 overflow"), semver())
     }
 
-    fn xxx(i: u8, j: u8) -> Self {
+    pub fn xxx(i: u8, j: u8) -> Self {
         Self(i, j, semver())
     }
 
-    fn v0() -> Self {
+    pub fn v0() -> Self {
         Self::xxx(1, 0)
     }
 }
 
-struct HeaderItem {
+pub struct HeaderItem {
     name: Arc<str>,
     version: Version
 }
 
 impl HeaderItem {
-    fn new(name: &str) -> Self {
+    pub fn new(name: &str) -> Self {
         Self {
             name: name.into(),
             version: Version::v0()
@@ -48,13 +48,13 @@ impl HeaderItem {
     }
 }
 
-struct HeaderData {
+pub struct HeaderData {
     header: HeaderItem,
     data: HeaderItem
 }
 
 impl HeaderData {
-    fn new(name: &str) -> Self {
+    pub fn new(name: &str) -> Self {
         Self {
             header: HeaderItem::new(name),
             data: HeaderItem::new(Arc::new("data-".to_owned() + name + semver().to_string().as_ref()).as_ref())
@@ -62,13 +62,13 @@ impl HeaderData {
     }
 }
 
-struct HeaderFunction {
+pub struct HeaderFunction {
     header: HeaderItem,
     function: HeaderData
 }
 
 impl HeaderFunction {
-    fn new(name: &str) -> Self {
+    pub fn new(name: &str) -> Self {
         Self {
             header: HeaderItem::new(name),
             function: HeaderData::new(Arc::new("fn-".to_owned() + name + semver().to_string().as_ref()).as_ref())
@@ -76,14 +76,12 @@ impl HeaderFunction {
     }
 }
 
-struct Header {
+pub struct Header(HeaderItem, HeaderFunction, HeaderData);
 
-}
-
-mod parser {
+pub mod parser {
     use super::{Header, HeaderItem, HeaderFunction, HeaderData};
 
-    struct ParseState {
+    pub struct ParseState {
         header: HeaderItem,
         intern: HeaderData,
         data: HeaderData,
@@ -91,7 +89,7 @@ mod parser {
     }
 
     impl ParseState {
-        fn init() -> Self {
+        pub fn init() -> Self {
             Self {
                 header: HeaderItem::new("parser"),
                 intern: HeaderData::new("interner"),
@@ -101,9 +99,9 @@ mod parser {
         }
     }
 
-    pub(crate) struct Parser(ParseState);
+    pub struct Parser(ParseState);
 
-    fn parse(_header: Header) -> Parser {
+    pub fn parse(_header: Header) -> Parser {
         Parser(ParseState::init())
     }
 }
@@ -111,5 +109,9 @@ mod parser {
 pub mod header {
     use super::parser;
 
-    struct Header(super::Header, parser::Parser);
+    pub struct Header(super::Header, parser::Parser);
+}
+
+pub fn init() {
+    println!("[hapt-header] init...");
 }

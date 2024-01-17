@@ -310,6 +310,6 @@ pub fn init() -> Result<(usize, usize), ()> {
     })
 }
 
-pub mod ehptloader {
-    pub fn init() -> Result<(usize, usize), ()> { init() }
+pub mod bootloader {
+    pub fn init() -> Result<(usize, usize), ()> { super::haptloader::init() }
 }
